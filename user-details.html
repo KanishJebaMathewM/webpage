@@ -72,21 +72,11 @@
                         </div>
 
                         <!-- District -->
-                        <div class="form-group district-group">
+                        <div class="form-group">
                             <label for="district">District</label>
-                            <div class="district-input">
-                                <div class="input-with-icon">
-                                    <i class="fas fa-map-marked-alt"></i>
-                                    <input type="text" id="district" placeholder="Enter district" required>
-                                </div>
-                                <div class="district-buttons">
-                                    <button type="button" class="btn-save" id="saveDistrict">
-                                        <i class="fas fa-check"></i> Save
-                                    </button>
-                                    <button type="button" class="btn-edit" id="editDistrict" style="display: none;">
-                                        <i class="fas fa-edit"></i> Edit
-                                    </button>
-                                </div>
+                            <div class="input-with-icon">
+                                <i class="fas fa-map-marked-alt"></i>
+                                <input type="text" id="district" placeholder="Enter district" required>
                             </div>
                         </div>
                     </div>
@@ -107,9 +97,13 @@
 
                     <!-- Form Actions -->
                     <div class="form-actions">
-                        <button type="submit" class="btn-continue">
-                            <span>Continue</span>
-                            <i class="fas fa-arrow-right"></i>
+                        <button type="submit" class="btn-save-form">
+                            <span>Save</span>
+                            <i class="fas fa-save"></i>
+                        </button>
+                        <button type="button" class="btn-view-entities" id="viewEntities">
+                            <span>View Entities</span>
+                            <i class="fas fa-list"></i>
                         </button>
                     </div>
                 </form>
@@ -137,12 +131,6 @@
                 </div>
             </div>
             <div class="manager-actions">
-                <button type="button" class="btn-save manager-save">
-                    <i class="fas fa-check"></i> Save
-                </button>
-                <button type="button" class="btn-edit manager-edit">
-                    <i class="fas fa-edit"></i> Edit
-                </button>
                 <button type="button" class="btn-delete manager-delete">
                     <i class="fas fa-trash"></i>
                 </button>

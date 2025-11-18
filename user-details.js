@@ -4,41 +4,67 @@ document.addEventListener('DOMContentLoaded', function() {
     const addManagerBtn = document.getElementById('addManager');
     const managersList = document.getElementById('managersList');
     const managerTemplate = document.getElementById('managerTemplate');
-    const saveDistrictBtn = document.getElementById('saveDistrict');
-    const editDistrictBtn = document.getElementById('editDistrict');
-    const districtInput = document.getElementById('district');
-    let isEditingDistrict = false;
+    const viewEntitiesBtn = document.getElementById('viewEntities');
+
+    // API Base URL - update this to match your backend URL
+    const API_BASE_URL = 'http://localhost:8000';
 
     // Initialize the page
     initPage();
 
-    // Form submission
+    // Form submission - Save to backend
     if (userForm) {
-        userForm.addEventListener('submit', function(e) {
+        userForm.addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            // Show loading state on the continue button
-            const continueBtn = this.querySelector('.btn-continue');
-            const originalContent = continueBtn.innerHTML;
-            continueBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
-            continueBtn.disabled = true;
+            // Show loading state on the save button
+            const saveBtn = this.querySelector('.btn-save-form');
+            const originalContent = saveBtn.innerHTML;
+            saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+            saveBtn.disabled = true;
             
-            // Simulate form submission
-            setTimeout(() => {
-                // In a real app, you would send the form data to your server here
+            try {
+                // Get form data
                 const formData = getFormData();
-                console.log('Form submitted:', formData);
                 
-                // Show success message
-                alert('Your information has been saved successfully!');
+                // Send data to backend
+                const response = await fetch(`${API_BASE_URL}/user-details/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
                 
-                // Reset button state
-                continueBtn.innerHTML = originalContent;
-                continueBtn.disabled = false;
-                
-                // In a real app, you might redirect to a dashboard here
-                // window.location.href = 'dashboard.html';
-            }, 1500);
+                if (response.ok) {
+                    const result = await response.json();
+                    console.log('Data saved successfully:', result);
+                    
+                    // Show success message
+                    saveBtn.innerHTML = '<i class="fas fa-check"></i> Saved!';
+                    saveBtn.style.backgroundColor = '#10B981';
+                    
+                    setTimeout(() => {
+                        saveBtn.innerHTML = originalContent;
+                        saveBtn.style.backgroundColor = '';
+                        saveBtn.disabled = false;
+                    }, 2000);
+                } else {
+                    throw new Error('Failed to save data');
+                }
+            } catch (error) {
+                console.error('Error saving data:', error);
+                alert('Failed to save data. Please ensure the backend server is running.');
+                saveBtn.innerHTML = originalContent;
+                saveBtn.disabled = false;
+            }
+        });
+    }
+
+    // View entities button click handler
+    if (viewEntitiesBtn) {
+        viewEntitiesBtn.addEventListener('click', function() {
+            window.location.href = 'view-entities.html';
         });
     }
 
@@ -49,27 +75,10 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Save district button click handler
-    if (saveDistrictBtn) {
-        saveDistrictBtn.addEventListener('click', function() {
-            saveDistrict();
-        });
-    }
-
-    // Edit district button click handler
-    if (editDistrictBtn) {
-        editDistrictBtn.addEventListener('click', function() {
-            editDistrict();
-        });
-    }
-
     // Initialize the page
     function initPage() {
         // Add ripple effect to buttons
         initRippleEffect();
-        
-        // Load any saved data (in a real app, this would come from your backend)
-        loadSavedData();
     }
 
     // Add a new manager card
@@ -83,15 +92,6 @@ document.addEventListener('DOMContentLoaded', function() {
         if (managerData.name) {
             managerElement.querySelector('.manager-name').value = managerData.name;
             managerElement.querySelector('.manager-phone').value = managerData.phone;
-            
-            // Show edit button and hide save button by default for existing managers
-            const saveBtn = managerElement.querySelector('.manager-save');
-            const editBtn = managerElement.querySelector('.manager-edit');
-            const inputs = managerElement.querySelectorAll('input');
-            
-            saveBtn.style.display = 'none';
-            editBtn.style.display = 'inline-flex';
-            inputs.forEach(input => input.disabled = true);
         }
         
         // Add event listeners for the manager card
@@ -106,54 +106,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Set up event listeners for a manager card
     function setupManagerCard(managerElement) {
-        const saveBtn = managerElement.querySelector('.manager-save');
-        const editBtn = managerElement.querySelector('.manager-edit');
         const deleteBtn = managerElement.querySelector('.manager-delete');
-        const inputs = managerElement.querySelectorAll('input');
-        
-        // Save button click handler
-        saveBtn.addEventListener('click', function() {
-            // Validate inputs
-            let isValid = true;
-            inputs.forEach(input => {
-                if (!input.value.trim()) {
-                    isValid = false;
-                    input.style.borderColor = '#ef4444';
-                    setTimeout(() => {
-                        input.style.borderColor = '';
-                    }, 2000);
-                }
-            });
-            
-            if (isValid) {
-                // In a real app, you would save the data to your backend here
-                saveBtn.innerHTML = '<i class="fas fa-check"></i> Saved!';
-                saveBtn.style.backgroundColor = '#10B981';
-                
-                // Switch to edit mode after a delay
-                setTimeout(() => {
-                    inputs.forEach(input => input.disabled = true);
-                    saveBtn.style.display = 'none';
-                    editBtn.style.display = 'inline-flex';
-                    
-                    // Reset button state
-                    setTimeout(() => {
-                        saveBtn.innerHTML = '<i class="fas fa-check"></i> Save';
-                        saveBtn.style.backgroundColor = '';
-                    }, 500);
-                }, 1000);
-            }
-        });
-        
-        // Edit button click handler
-        editBtn.addEventListener('click', function() {
-            inputs.forEach(input => input.disabled = false);
-            saveBtn.style.display = 'inline-flex';
-            editBtn.style.display = 'none';
-            
-            // Focus on the first input
-            inputs[0].focus();
-        });
         
         // Delete button click handler
         deleteBtn.addEventListener('click', function() {
@@ -166,45 +119,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Remove the element after the animation completes
                 setTimeout(() => {
                     managerElement.remove();
-                    
-                    // In a real app, you would also delete the manager from your backend
-                    console.log('Manager removed');
                 }, 300);
             }
         });
         
-        // Add ripple effect to buttons
-        [saveBtn, editBtn, deleteBtn].forEach(btn => {
-            btn.addEventListener('click', createRipple);
-        });
-    }
-
-    // Save district information
-    function saveDistrict() {
-        if (!districtInput.value.trim()) {
-            // Show error if district is empty
-            districtInput.style.borderColor = '#ef4444';
-            setTimeout(() => {
-                districtInput.style.borderColor = '';
-            }, 2000);
-            return;
-        }
-        
-        // Disable the input and show edit button
-        districtInput.disabled = true;
-        saveDistrictBtn.style.display = 'none';
-        editDistrictBtn.style.display = 'inline-flex';
-        
-        // In a real app, you would save the district to your backend here
-        console.log('District saved:', districtInput.value);
-    }
-
-    // Edit district information
-    function editDistrict() {
-        districtInput.disabled = false;
-        districtInput.focus();
-        saveDistrictBtn.style.display = 'inline-flex';
-        editDistrictBtn.style.display = 'none';
+        // Add ripple effect to button
+        deleteBtn.addEventListener('click', createRipple);
     }
 
     // Get form data as an object
@@ -212,7 +132,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const formData = {
             name: document.getElementById('name').value,
             pan: document.getElementById('pan').value,
-            gst: document.getElementById('gst').value,
+            gst: document.getElementById('gst').value || null,
             phone: document.getElementById('phone').value,
             address: document.getElementById('address').value,
             district: document.getElementById('district').value,
@@ -222,50 +142,17 @@ document.addEventListener('DOMContentLoaded', function() {
         // Get manager data
         const managerCards = document.querySelectorAll('.manager-card');
         managerCards.forEach(card => {
-            formData.managers.push({
-                name: card.querySelector('.manager-name').value,
-                phone: card.querySelector('.manager-phone').value
-            });
+            const managerName = card.querySelector('.manager-name').value;
+            const managerPhone = card.querySelector('.manager-phone').value;
+            if (managerName && managerPhone) {
+                formData.managers.push({
+                    name: managerName,
+                    phone: managerPhone
+                });
+            }
         });
         
         return formData;
-    }
-
-    // Load saved data (simulated)
-    function loadSavedData() {
-        // In a real app, you would fetch this from your backend
-        const savedData = {
-            // Example data - in a real app, this would come from your API
-            name: 'John Doe',
-            pan: 'ABCDE1234F',
-            gst: '22ABCDE1234F1Z5',
-            phone: '9876543210',
-            address: '123 Business Street, Tech Park',
-            district: 'Bangalore',
-            managers: [
-                { name: 'Jane Smith', phone: '9876543211' },
-                { name: 'Mike Johnson', phone: '9876543212' }
-            ]
-        };
-        
-        // Populate form fields
-        if (savedData.name) document.getElementById('name').value = savedData.name;
-        if (savedData.pan) document.getElementById('pan').value = savedData.pan;
-        if (savedData.gst) document.getElementById('gst').value = savedData.gst;
-        if (savedData.phone) document.getElementById('phone').value = savedData.phone;
-        if (savedData.address) document.getElementById('address').value = savedData.address;
-        if (savedData.district) {
-            document.getElementById('district').value = savedData.district;
-            // Trigger save to show the edit button
-            saveDistrict();
-        }
-        
-        // Add saved managers
-        if (savedData.managers && savedData.managers.length > 0) {
-            savedData.managers.forEach(manager => {
-                addManager(manager);
-            });
-        }
     }
 
     // Initialize ripple effect for buttons
