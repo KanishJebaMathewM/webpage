@@ -9,6 +9,11 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
+    <!-- Backend Status Indicator -->
+    <div id="backend-status" style="position: fixed; top: 10px; right: 10px; padding: 8px 12px; background: rgba(239, 68, 68, 0.9); color: white; border-radius: 6px; font-size: 0.85rem; z-index: 1000; display: none; font-family: 'Inter', sans-serif;">
+        <i class="fas fa-exclamation-circle"></i> <span id="status-text">Backend not connected</span>
+    </div>
+    
     <div class="background">
         <div id="particles-js"></div>
         <div class="login-container">
