@@ -164,11 +164,11 @@ select,
 textarea {
     width: 100%;
     padding: 0.875rem 1rem 0.875rem 2.75rem;
-    font-size: 1rem;
-    border: 2px solid var(--border-color);
-    border-radius: 12px;
+    font-size: 0.95rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
     transition: var(--transition);
-    background-color: var(--light-bg);
+    background-color: rgba(248, 249, 250, 0.7);
 }
 
 textarea {
@@ -182,8 +182,9 @@ input:focus,
 select:focus,
 textarea:focus {
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+    box-shadow: 0 0 0 4px rgba(76, 175, 80, 0.15);
     outline: none;
+    background-color: var(--white);
 }
 
 /* District Section */
