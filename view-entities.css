@@ -559,6 +559,21 @@ button {
 .manager-info {
     display: flex;
     flex-direction: column;
+    gap: 0.5rem;
+    flex: 1;
+}
+
+.manager-field {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.manager-label {
+    font-weight: 600;
+    color: var(--text-secondary);
+    min-width: 60px;
+    font-size: 0.9rem;
 }
 
 .manager-name {
@@ -568,7 +583,8 @@ button {
 
 .manager-phone {
     font-size: 0.9rem;
-    color: var(--text-secondary);
+    color: var(--text-primary);
+    font-weight: 500;
 }
 
 .no-managers {
