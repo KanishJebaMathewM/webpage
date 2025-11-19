@@ -9,9 +9,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const addNewBtn = document.getElementById('addNewBtn');
     const entityTemplate = document.getElementById('entityTemplate');
 
-    // API Base URL
-    const API_BASE_URL = 'http://localhost:8000';
-
     // Initialize page
     loadEntities();
 
@@ -34,18 +31,13 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Load all entities from backend
-    async function loadEntities() {
+    // Load all entities from localStorage
+    function loadEntities() {
         showLoading();
 
         try {
-            const response = await fetch(`${API_BASE_URL}/user-details/`);
-            
-            if (!response.ok) {
-                throw new Error('Failed to fetch entities');
-            }
-
-            const entities = await response.json();
+            // Get entities from localStorage
+            const entities = JSON.parse(localStorage.getItem('userEntities') || '[]');
             
             if (entities.length === 0) {
                 showEmptyState();
@@ -54,7 +46,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         } catch (error) {
             console.error('Error loading entities:', error);
-            alert('Failed to load entities. Please ensure the backend server is running.');
+            alert('Failed to load entities. Please try again.');
             showEmptyState();
         }
     }
@@ -80,14 +72,40 @@ document.addEventListener('DOMContentLoaded', function() {
     function createEntityCard(entity) {
         const template = entityTemplate.content.cloneNode(true);
         const card = template.querySelector('.entity-card');
+        
+        // Store entity ID on the card
+        card.dataset.entityId = entity.id;
 
-        // Set entity data
-        card.querySelector('.entity-name').textContent = entity.name;
-        card.querySelector('.entity-pan').textContent = entity.pan;
-        card.querySelector('.entity-gst').textContent = entity.gst || 'N/A';
-        card.querySelector('.entity-phone').textContent = entity.phone;
-        card.querySelector('.entity-address').textContent = entity.address;
-        card.querySelector('.entity-district').textContent = entity.district;
+        // Set entity data with editable fields
+        const nameEl = card.querySelector('.entity-name');
+        nameEl.contentEditable = true;
+        nameEl.textContent = entity.name;
+        nameEl.title = 'Click to edit';
+        
+        const panEl = card.querySelector('.entity-pan');
+        panEl.contentEditable = true;
+        panEl.textContent = entity.pan;
+        panEl.title = 'Click to edit';
+        
+        const gstEl = card.querySelector('.entity-gst');
+        gstEl.contentEditable = true;
+        gstEl.textContent = entity.gst || 'N/A';
+        gstEl.title = 'Click to edit';
+        
+        const phoneEl = card.querySelector('.entity-phone');
+        phoneEl.contentEditable = true;
+        phoneEl.textContent = entity.phone;
+        phoneEl.title = 'Click to edit';
+        
+        const addressEl = card.querySelector('.entity-address');
+        addressEl.contentEditable = true;
+        addressEl.textContent = entity.address;
+        addressEl.title = 'Click to edit';
+        
+        const districtEl = card.querySelector('.entity-district');
+        districtEl.contentEditable = true;
+        districtEl.textContent = entity.district;
+        districtEl.title = 'Click to edit';
         
         // Format created date
         const createdDate = new Date(entity.created_at);
@@ -99,19 +117,44 @@ document.addEventListener('DOMContentLoaded', function() {
             minute: '2-digit'
         });
 
+        // Add blur event listeners to save changes
+        [nameEl, panEl, gstEl, phoneEl, addressEl, districtEl].forEach(el => {
+            el.addEventListener('blur', () => saveEntityChanges(entity.id, card));
+            el.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    el.blur();
+                }
+            });
+        });
+
         // Display managers
         const managersList = card.querySelector('.managers-list-view');
         if (entity.managers && entity.managers.length > 0) {
-            entity.managers.forEach(manager => {
+            entity.managers.forEach((manager, index) => {
                 const managerItem = document.createElement('div');
                 managerItem.className = 'manager-item';
                 managerItem.innerHTML = `
                     <div class="manager-info">
-                        <span class="manager-name">${manager.name}</span>
-                        <span class="manager-phone">${manager.phone}</span>
+                        <span class="manager-name" contenteditable="true" title="Click to edit">${manager.name}</span>
+                        <span class="manager-phone" contenteditable="true" title="Click to edit">${manager.phone}</span>
                     </div>
                     <i class="fas fa-user-tie" style="color: var(--primary-color);"></i>
                 `;
+                
+                // Add blur event listeners for managers
+                const managerNameEl = managerItem.querySelector('.manager-name');
+                const managerPhoneEl = managerItem.querySelector('.manager-phone');
+                [managerNameEl, managerPhoneEl].forEach(el => {
+                    el.addEventListener('blur', () => saveEntityChanges(entity.id, card));
+                    el.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter') {
+                            e.preventDefault();
+                            el.blur();
+                        }
+                    });
+                });
+                
                 managersList.appendChild(managerItem);
             });
         } else {
@@ -120,9 +163,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Delete button
         const deleteBtn = card.querySelector('.btn-delete-entity');
-        deleteBtn.addEventListener('click', async () => {
+        deleteBtn.addEventListener('click', () => {
             if (confirm(`Are you sure you want to delete the entity for ${entity.name}?`)) {
-                await deleteEntity(entity.id);
+                deleteEntity(entity.id);
             }
         });
 
@@ -132,19 +175,60 @@ document.addEventListener('DOMContentLoaded', function() {
         return template;
     }
 
-    // Delete entity
-    async function deleteEntity(entityId) {
+    // Save entity changes
+    function saveEntityChanges(entityId, card) {
         try {
-            const response = await fetch(`${API_BASE_URL}/user-details/${entityId}`, {
-                method: 'DELETE'
+            // Get all entities
+            let entities = JSON.parse(localStorage.getItem('userEntities') || '[]');
+            
+            // Find the entity to update
+            const entityIndex = entities.findIndex(e => e.id === entityId);
+            if (entityIndex === -1) return;
+            
+            // Update entity data from card
+            entities[entityIndex].name = card.querySelector('.entity-name').textContent;
+            entities[entityIndex].pan = card.querySelector('.entity-pan').textContent;
+            const gstText = card.querySelector('.entity-gst').textContent;
+            entities[entityIndex].gst = gstText === 'N/A' ? null : gstText;
+            entities[entityIndex].phone = card.querySelector('.entity-phone').textContent;
+            entities[entityIndex].address = card.querySelector('.entity-address').textContent;
+            entities[entityIndex].district = card.querySelector('.entity-district').textContent;
+            
+            // Update managers
+            const managerItems = card.querySelectorAll('.manager-item');
+            entities[entityIndex].managers = [];
+            managerItems.forEach(item => {
+                const name = item.querySelector('.manager-name')?.textContent;
+                const phone = item.querySelector('.manager-phone')?.textContent;
+                if (name && phone) {
+                    entities[entityIndex].managers.push({ name, phone });
+                }
             });
+            
+            // Save to localStorage
+            localStorage.setItem('userEntities', JSON.stringify(entities));
+            
+            console.log('Entity updated successfully');
+        } catch (error) {
+            console.error('Error saving changes:', error);
+            alert('Failed to save changes. Please try again.');
+        }
+    }
 
-            if (response.ok) {
-                // Reload entities
-                loadEntities();
-            } else {
-                throw new Error('Failed to delete entity');
-            }
+    // Delete entity
+    function deleteEntity(entityId) {
+        try {
+            // Get all entities
+            let entities = JSON.parse(localStorage.getItem('userEntities') || '[]');
+            
+            // Filter out the deleted entity
+            entities = entities.filter(e => e.id !== entityId);
+            
+            // Save back to localStorage
+            localStorage.setItem('userEntities', JSON.stringify(entities));
+            
+            // Reload entities
+            loadEntities();
         } catch (error) {
             console.error('Error deleting entity:', error);
             alert('Failed to delete entity. Please try again.');

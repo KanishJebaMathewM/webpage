@@ -6,15 +6,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const managerTemplate = document.getElementById('managerTemplate');
     const viewEntitiesBtn = document.getElementById('viewEntities');
 
-    // API Base URL - update this to match your backend URL
-    const API_BASE_URL = 'http://localhost:8000';
-
     // Initialize the page
     initPage();
 
-    // Form submission - Save to backend
+    // Form submission - Save to localStorage
     if (userForm) {
-        userForm.addEventListener('submit', async function(e) {
+        userForm.addEventListener('submit', function(e) {
             e.preventDefault();
             
             // Show loading state on the save button
@@ -27,34 +24,37 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Get form data
                 const formData = getFormData();
                 
-                // Send data to backend
-                const response = await fetch(`${API_BASE_URL}/user-details/`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(formData)
-                });
+                // Add ID and timestamp
+                formData.id = Date.now();
+                formData.created_at = new Date().toISOString();
                 
-                if (response.ok) {
-                    const result = await response.json();
-                    console.log('Data saved successfully:', result);
-                    
-                    // Show success message
-                    saveBtn.innerHTML = '<i class="fas fa-check"></i> Saved!';
-                    saveBtn.style.backgroundColor = '#10B981';
-                    
-                    setTimeout(() => {
-                        saveBtn.innerHTML = originalContent;
-                        saveBtn.style.backgroundColor = '';
-                        saveBtn.disabled = false;
-                    }, 2000);
-                } else {
-                    throw new Error('Failed to save data');
-                }
+                // Get existing data from localStorage
+                let entities = JSON.parse(localStorage.getItem('userEntities') || '[]');
+                
+                // Add new entity
+                entities.push(formData);
+                
+                // Save to localStorage
+                localStorage.setItem('userEntities', JSON.stringify(entities));
+                
+                console.log('Data saved successfully:', formData);
+                
+                // Show success message
+                saveBtn.innerHTML = '<i class="fas fa-check"></i> Saved!';
+                saveBtn.style.backgroundColor = '#10B981';
+                
+                setTimeout(() => {
+                    saveBtn.innerHTML = originalContent;
+                    saveBtn.style.backgroundColor = '';
+                    saveBtn.disabled = false;
+                    // Reset form
+                    userForm.reset();
+                    // Clear managers
+                    managersList.innerHTML = '';
+                }, 2000);
             } catch (error) {
                 console.error('Error saving data:', error);
-                alert('Failed to save data. Please ensure the backend server is running.');
+                alert('Failed to save data. Please try again.');
                 saveBtn.innerHTML = originalContent;
                 saveBtn.disabled = false;
             }
