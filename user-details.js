@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const managersList = document.getElementById('managersList');
     const managerTemplate = document.getElementById('managerTemplate');
     const viewEntitiesBtn = document.getElementById('viewEntities');
+    const editToggleBtn = document.getElementById('editToggle');
 
     // Initialize the page
     initPage();
@@ -75,10 +76,138 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // Edit mode toggle
+    if (editToggleBtn) {
+        // Start in non-edit mode
+        setEditMode(false);
+        
+        editToggleBtn.addEventListener('click', function() {
+            const isEditing = document.body.classList.toggle('edit-mode');
+            setEditMode(isEditing);
+        });
+    }
+
     // Initialize the page
     function initPage() {
+        // Initialize particles.js
+        initParticles();
+        
         // Add ripple effect to buttons
         initRippleEffect();
+    }
+
+    // Initialize particles.js for background effect
+    function initParticles() {
+        if (typeof particlesJS !== 'undefined') {
+            particlesJS('particles-js', {
+                particles: {
+                    number: {
+                        value: 80,
+                        density: {
+                            enable: true,
+                            value_area: 800
+                        }
+                    },
+                    color: {
+                        value: '#4CAF50'
+                    },
+                    shape: {
+                        type: 'circle'
+                    },
+                    opacity: {
+                        value: 0.5,
+                        random: false
+                    },
+                    size: {
+                        value: 3,
+                        random: true
+                    },
+                    line_linked: {
+                        enable: true,
+                        distance: 150,
+                        color: '#4CAF50',
+                        opacity: 0.4,
+                        width: 1
+                    },
+                    move: {
+                        enable: true,
+                        speed: 2,
+                        direction: 'none',
+                        random: false,
+                        straight: false,
+                        out_mode: 'out',
+                        bounce: false
+                    }
+                },
+                interactivity: {
+                    detect_on: 'canvas',
+                    events: {
+                        onhover: {
+                            enable: true,
+                            mode: 'grab'
+                        },
+                        onclick: {
+                            enable: true,
+                            mode: 'push'
+                        },
+                        resize: true
+                    },
+                    modes: {
+                        grab: {
+                            distance: 140,
+                            line_linked: {
+                                opacity: 1
+                            }
+                        },
+                        push: {
+                            particles_nb: 4
+                        }
+                    }
+                },
+                retina_detect: true
+            });
+        }
+    }
+
+    // Set edit mode state
+    function setEditMode(isEditing) {
+        const formInputs = document.querySelectorAll('.user-form input, .user-form textarea, .user-form select');
+        const managerInputs = document.querySelectorAll('.manager-card input');
+        
+        formInputs.forEach(input => {
+            input.disabled = !isEditing;
+        });
+        
+        managerInputs.forEach(input => {
+            input.disabled = !isEditing;
+        });
+        
+        // Update button text and style
+        if (editToggleBtn) {
+            if (isEditing) {
+                editToggleBtn.classList.add('editing');
+                editToggleBtn.querySelector('span').textContent = 'Done';
+                editToggleBtn.querySelector('i').classList.remove('fa-edit');
+                editToggleBtn.querySelector('i').classList.add('fa-check');
+            } else {
+                editToggleBtn.classList.remove('editing');
+                editToggleBtn.querySelector('span').textContent = 'Edit';
+                editToggleBtn.querySelector('i').classList.remove('fa-check');
+                editToggleBtn.querySelector('i').classList.add('fa-edit');
+            }
+        }
+        
+        // Disable/enable buttons in edit mode
+        if (addManagerBtn) {
+            addManagerBtn.disabled = !isEditing;
+            addManagerBtn.style.opacity = isEditing ? '1' : '0.5';
+        }
+        
+        const deleteButtons = document.querySelectorAll('.manager-delete');
+        deleteButtons.forEach(btn => {
+            btn.disabled = !isEditing;
+            btn.style.opacity = isEditing ? '1' : '0.5';
+        });
     }
 
     // Add a new manager card
@@ -107,6 +236,15 @@ document.addEventListener('DOMContentLoaded', function() {
     // Set up event listeners for a manager card
     function setupManagerCard(managerElement) {
         const deleteBtn = managerElement.querySelector('.manager-delete');
+        
+        // Set initial disabled state based on current edit mode
+        const isEditing = document.body.classList.contains('edit-mode');
+        const inputs = managerElement.querySelectorAll('input');
+        inputs.forEach(input => {
+            input.disabled = !isEditing;
+        });
+        deleteBtn.disabled = !isEditing;
+        deleteBtn.style.opacity = isEditing ? '1' : '0.5';
         
         // Delete button click handler
         deleteBtn.addEventListener('click', function() {
