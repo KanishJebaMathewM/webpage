@@ -1,33 +1,16 @@
 # SecureAccess Web Application
 
-A modern web application for managing user details with a clean, professional UI and Python backend.
-
-## ⚠️ IMPORTANT: Starting the Backend
-
-**Before using the application, you MUST start the backend server:**
-
-### Option 1: Windows
-1. Navigate to the `backend` folder
-2. Double-click `start.bat`
-
-### Option 2: Linux/Mac
-1. Open terminal in the `backend` folder
-2. Run: `./start.sh`
-
-### Option 3: Manual Start
-1. Navigate to the `backend` folder
-2. Run: `python main.py`
-
-The backend will be available at `http://localhost:8000`
+A modern web application for managing user details with a clean, professional UI using JavaScript localStorage for data persistence.
 
 ## Features
 
 - **Login Page**: Clean and compact login interface with animated background
 - **User Details Management**: Enter and save user information including managers
 - **View All Entities**: Display all saved user details in an organized card-based layout
-- **Python Backend**: FastAPI-based REST API with SQLite database
+- **Editable Data**: Click on any field in the view entities page to edit and save changes
+- **Local Storage**: All data is stored locally in the browser using JavaScript localStorage
 - **Modern UI**: Professional design with smooth animations, particles.js effects, and responsive layout
-- **Backend Status Indicator**: Visual notification when backend is connected/disconnected
+- **No Backend Required**: Pure frontend application with client-side data storage
 
 ## Screenshots
 
@@ -44,57 +27,23 @@ The backend will be available at `http://localhost:8000`
 
 ### Quick Start
 
-1. **Start the Backend Server (REQUIRED)**
+1. **Open the Application**
    
-   Choose one method:
-   - **Windows**: Double-click `backend/start.bat`
-   - **Linux/Mac**: Run `cd backend && ./start.sh`
-   - **Manual**: Run `cd backend && python main.py`
-
-2. **Open the Frontend**
+   Simply open `index.html` in your browser. No server or backend setup required!
    
-   Open `index.html` in your browser, or serve it with:
+   Alternatively, you can serve it with a local HTTP server:
    ```bash
    python -m http.server 8080
    ```
    Then navigate to `http://localhost:8080/index.html`
 
-3. **Check Backend Connection**
+2. **Start Using**
    
-   The login page will show a green "Backend connected" indicator in the top-right corner when the backend is running properly.
-
-### Detailed Backend Setup
-
-1. Navigate to the backend directory:
-   ```bash
-   cd backend
-   ```
-
-2. Install Python dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-3. Start the backend server:
-   ```bash
-   python main.py
-   ```
-
-   The backend will be running at `http://localhost:8000`
-
-### Frontend Setup
-
-1. From the root directory, start a simple HTTP server:
-   ```bash
-   python -m http.server 8080
-   ```
-
-   Or use any other HTTP server of your choice.
-
-2. Open your browser and navigate to:
-   ```
-   http://localhost:8080/index.html
-   ```
+   - Login with any credentials (demo mode)
+   - Add user details and managers
+   - View and edit saved entities
+   
+   All data is stored locally in your browser's localStorage.
 
 ## Usage
 
@@ -107,9 +56,10 @@ The backend will be available at `http://localhost:8000`
    - Address
    - District
    - Managers (click "Add Manager" to add manager details)
-3. **Save**: Click the "Save" button to save the data to the backend
+3. **Save**: Click the "Save" button to save the data to localStorage
 4. **View Entities**: Click "View Entities" to see all saved user details
-5. **Manage**: From the View Entities page, you can delete entities or go back to add more
+5. **Edit**: Click on any field in an entity card to edit it. Changes are automatically saved when you click outside the field
+6. **Delete**: Click the delete button on any entity card to remove it from localStorage
 
 ## Technical Stack
 
@@ -117,40 +67,36 @@ The backend will be available at `http://localhost:8000`
 - HTML5
 - CSS3 (Flexbox, Grid, Animations)
 - Vanilla JavaScript (ES6+)
-- Fetch API for backend communication
+- localStorage API for data persistence
+- Particles.js for background effects
 
-### Backend
-- Python 3.12+
-- FastAPI - Modern web framework
-- SQLite - Lightweight database
-- Pydantic - Data validation
-- Uvicorn - ASGI server
+## Data Storage
 
-## API Endpoints
+All user data is stored in the browser's localStorage with the following structure:
 
-- `GET /` - Health check
-- `POST /user-details/` - Create new user detail entry
-- `GET /user-details/` - Get all user details
-- `DELETE /user-details/{id}` - Delete a user detail entry
+### Entity Object
+```javascript
+{
+  id: Number (timestamp),
+  name: String,
+  pan: String,
+  gst: String (optional),
+  phone: String,
+  address: String,
+  district: String,
+  created_at: String (ISO timestamp),
+  managers: [
+    {
+      name: String,
+      phone: String
+    }
+  ]
+}
+```
 
-## Database Schema
+### Legacy Backend (Deprecated)
 
-### user_details
-- id (INTEGER, PRIMARY KEY)
-- name (TEXT, NOT NULL)
-- pan (TEXT, NOT NULL)
-- gst (TEXT, OPTIONAL)
-- phone (TEXT, NOT NULL)
-- address (TEXT, NOT NULL)
-- district (TEXT, NOT NULL)
-- created_at (TIMESTAMP)
-
-### managers
-- id (INTEGER, PRIMARY KEY)
-- user_detail_id (INTEGER, FOREIGN KEY)
-- name (TEXT, NOT NULL)
-- phone (TEXT, NOT NULL)
-- created_at (TIMESTAMP)
+The `backend` folder contains a legacy Python/FastAPI implementation that is no longer used. The application now uses client-side localStorage instead.
 
 ## Browser Compatibility
 
@@ -163,9 +109,11 @@ The backend will be available at `http://localhost:8000`
 
 The application follows a simple architecture:
 - **Separation of Concerns**: HTML for structure, CSS for styling, JS for behavior
-- **RESTful API**: Clean API design with proper HTTP methods
+- **Client-Side Storage**: Uses localStorage for persistent data storage
+- **Editable UI**: ContentEditable fields for inline editing
 - **Responsive Design**: Works on various screen sizes
 - **No Build Tools**: Simple setup without complex build processes
+- **No Backend Required**: Pure frontend application
 
 ## License
 

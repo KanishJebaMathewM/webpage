@@ -1,7 +1,4 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Check backend status
-    checkBackendStatus();
-
     // Initialize particles.js for background effect
     if (typeof particlesJS !== 'undefined') {
         particlesJS('particles-js', {
@@ -71,33 +68,6 @@ document.addEventListener('DOMContentLoaded', function() {
             },
             retina_detect: true
         });
-    }
-
-    // Function to check backend status
-    async function checkBackendStatus() {
-        try {
-            const response = await fetch('http://localhost:8000/', {
-                method: 'GET',
-                mode: 'cors'
-            });
-            if (response.ok) {
-                const statusDiv = document.getElementById('backend-status');
-                if (statusDiv) {
-                    statusDiv.style.background = 'rgba(76, 175, 80, 0.9)';
-                    statusDiv.querySelector('#status-text').textContent = 'Backend connected';
-                    statusDiv.style.display = 'block';
-                    setTimeout(() => {
-                        statusDiv.style.display = 'none';
-                    }, 3000);
-                }
-            }
-        } catch (error) {
-            const statusDiv = document.getElementById('backend-status');
-            if (statusDiv) {
-                statusDiv.style.display = 'block';
-                statusDiv.querySelector('#status-text').innerHTML = 'Backend not running. <a href="#" onclick="alert(\'Please start the backend server:\\n\\n1. Navigate to the backend folder\\n2. Run: python main.py\\n   or double-click start.bat (Windows)\\n   or run: ./start.sh (Linux/Mac)\'); return false;" style="color: white; text-decoration: underline;">Click for help</a>';
-            }
-        }
     }
 
     // Toggle password visibility
