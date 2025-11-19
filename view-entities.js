@@ -175,8 +175,14 @@
                 managerItem.className = 'manager-item';
                 managerItem.innerHTML = `
                     <div class="manager-info">
-                        <span class="manager-name" contenteditable="true" title="Click to edit">${manager.name}</span>
-                        <span class="manager-phone" contenteditable="true" title="Click to edit">${manager.phone}</span>
+                        <div class="manager-field">
+                            <span class="manager-label">Name:</span>
+                            <span class="manager-name" contenteditable="false" title="Click edit to modify">${manager.name}</span>
+                        </div>
+                        <div class="manager-field">
+                            <span class="manager-label">Phone:</span>
+                            <span class="manager-phone" contenteditable="false" title="Click edit to modify">${manager.phone}</span>
+                        </div>
                     </div>
                     <i class="fas fa-user-tie" style="color: var(--primary-color);"></i>
                 `;
@@ -229,6 +235,11 @@
                         }
                         addressEl.addEventListener('input', addressEl._resizeHandler);
                     }
+                    // Make manager fields editable
+                    const managerNames = card.querySelectorAll('.manager-name');
+                    const managerPhones = card.querySelectorAll('.manager-phone');
+                    managerNames.forEach(el => el.contentEditable = true);
+                    managerPhones.forEach(el => el.contentEditable = true);
                     // Swap icon to save
                     const icon = editBtn.querySelector('i');
                     if (icon) {
@@ -252,6 +263,11 @@
                             addressEl.removeEventListener('input', addressEl._resizeHandler);
                         }
                     }
+                    // Make manager fields non-editable
+                    const managerNames = card.querySelectorAll('.manager-name');
+                    const managerPhones = card.querySelectorAll('.manager-phone');
+                    managerNames.forEach(el => el.contentEditable = false);
+                    managerPhones.forEach(el => el.contentEditable = false);
                     const icon = editBtn.querySelector('i');
                     if (icon) {
                         icon.classList.remove('fa-save');
