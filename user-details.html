@@ -10,15 +10,22 @@
 </head>
 <body>
     <div class="background">
+        <div id="particles-js"></div>
         <div class="container">
             <div class="user-details-card">
                 <!-- Header -->
                 <div class="header">
-                    <div class="logo">
-                        <div class="logo-icon">
-                            <i class="fas fa-user-circle"></i>
+                    <div class="header-top">
+                        <div class="logo">
+                            <div class="logo-icon">
+                                <i class="fas fa-user-circle"></i>
+                            </div>
+                            <h1>User Details</h1>
                         </div>
-                        <h1>User Details</h1>
+                        <button type="button" class="btn-edit-toggle" id="editToggle" title="Toggle edit mode">
+                            <i class="fas fa-edit"></i>
+                            <span>Edit</span>
+                        </button>
                     </div>
                     <p class="subtitle">Please provide your information to continue</p>
                 </div>
@@ -138,6 +145,8 @@
         </div>
     </template>
 
+    <!-- Add particles.js library -->
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     <script src="user-details.js"></script>
 </body>
 </html>
