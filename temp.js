@@ -5,8 +5,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const managersList = document.getElementById('managersList');
     const managerTemplate = document.getElementById('managerTemplate');
     const viewEntitiesBtn = document.getElementById('viewEntities');
-    const topViewBtn = document.getElementById('topViewEntities');
-    const topNewBtn = document.getElementById('topNewEntity');
     const editToggleBtn = document.getElementById('editToggle');
 
     // Initialize the page
@@ -25,77 +23,40 @@ document.addEventListener('DOMContentLoaded', function() {
             // Show loading state on the save button
             const saveBtn = this.querySelector('.btn-save-form');
             const originalContent = saveBtn.innerHTML;
-            
-            // Check if we're editing an existing entity
-            const editingEntityId = localStorage.getItem('editingEntityId');
-            if (editingEntityId) {
-                saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
-            } else {
-                saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
-            }
+            saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
             saveBtn.disabled = true;
             
             try {
                 // Get form data
                 const formData = getFormData();
                 
+                // Add ID and timestamp
+                formData.id = Date.now();
+                formData.created_at = new Date().toISOString();
+                
                 // Get existing data from localStorage
                 let entities = JSON.parse(localStorage.getItem('userEntities') || '[]');
                 
-                if (editingEntityId) {
-                    // Update existing entity
-                    const entityIndex = entities.findIndex(e => e.id == editingEntityId);
-                    if (entityIndex !== -1) {
-                        // Preserve original ID and creation timestamp
-                        formData.id = entities[entityIndex].id;
-                        formData.created_at = entities[entityIndex].created_at;
-                        // Update last modified timestamp
-                        formData.updated_at = new Date().toISOString();
-                        
-                        // Update the entity
-                        entities[entityIndex] = formData;
-                    }
-                } else {
-                    // Add new entity
-                    // Add ID and timestamp
-                    formData.id = Date.now();
-                    formData.created_at = new Date().toISOString();
-                    entities.push(formData);
-                }
+                // Add new entity
+                entities.push(formData);
                 
                 // Save to localStorage
                 localStorage.setItem('userEntities', JSON.stringify(entities));
                 
-                if (editingEntityId) {
-                    console.log('Data updated successfully:', formData);
-                    // Clear editing flag
-                    localStorage.removeItem('editingEntityId');
-                } else {
-                    console.log('Data saved successfully:', formData);
-                }
+                console.log('Data saved successfully:', formData);
                 
                 // Show success message
-                if (editingEntityId) {
-                    saveBtn.innerHTML = '<i class="fas fa-check"></i> Updated!';
-                } else {
-                    saveBtn.innerHTML = '<i class="fas fa-check"></i> Saved!';
-                }
+                saveBtn.innerHTML = '<i class="fas fa-check"></i> Saved!';
                 saveBtn.style.backgroundColor = '#10B981';
                 
                 setTimeout(() => {
                     saveBtn.innerHTML = originalContent;
                     saveBtn.style.backgroundColor = '';
                     saveBtn.disabled = false;
-                    
-                    if (editingEntityId) {
-                        // Redirect to view entities page after successful update
-                        window.location.href = 'view-entities.html';
-                    } else {
-                        // Reset form for new entity
-                        userForm.reset();
-                        // Clear managers
-                        managersList.innerHTML = '';
-                    }
+                    // Reset form
+                    userForm.reset();
+                    // Clear managers
+                    managersList.innerHTML = '';
                 }, 2000);
             } catch (error) {
                 console.error('Error saving data:', error);
@@ -113,24 +74,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Top-left view entities button (small)
-    if (topViewBtn) {
-        topViewBtn.addEventListener('click', function() {
-            window.location.href = 'view-entities.html';
-        });
-    }
-
-    // Top-left new entity button clears the form and editing flag
-    if (topNewBtn) {
-        topNewBtn.addEventListener('click', function() {
-            localStorage.removeItem('editingEntityId');
-            if (userForm) userForm.reset();
-            if (managersList) managersList.innerHTML = '';
-            document.body.classList.add('edit-mode');
-            setEditMode(true);
-        });
-    }
-
     // Add manager button click handler
     if (addManagerBtn) {
         addManagerBtn.addEventListener('click', function() {
@@ -144,31 +87,9 @@ document.addEventListener('DOMContentLoaded', function() {
     function initPage() {
         // Initialize particles.js
         initParticles();
-        
-        // Check if we're editing an existing entity
-        const editingEntityId = localStorage.getItem('editingEntityId');
-        if (editingEntityId) {
-            loadExistingEntity(editingEntityId);
-            // Update save button to show "Update" instead of "Save"
-            const saveBtn = document.querySelector('.btn-save-form');
-            if (saveBtn) {
-                saveBtn.innerHTML = '<span>Update</span><i class="fas fa-save"></i>';
-            }
-        } else {
-            // Clear any stale editing flag and ensure the form is empty when opening this page
-            localStorage.removeItem('editingEntityId');
-            if (userForm) {
-                userForm.reset();
-            }
-            if (managersList) {
-                managersList.innerHTML = '';
-            }
-
-            // Ensure the page shows editable inputs by default (editing moved to View Entities)
-            document.body.classList.add('edit-mode');
-            setEditMode(true);
-        }
-        
+        // Ensure the page shows editable inputs by default (editing moved to View Entities)
+        document.body.classList.add('edit-mode');
+        setEditMode(true);
         // Attach sanitizers to inputs on this page
         attachInputSanitizers();
 
@@ -178,6 +99,9 @@ document.addEventListener('DOMContentLoaded', function() {
             autoResizeTextarea(addressEl);
             addressEl.addEventListener('input', () => autoResizeTextarea(addressEl));
         }
+
+        // Add ripple effect to buttons
+        initRippleEffect();
     }
 
     // Attach sanitizer behavior to inputs on this page (name, pan, gst, phone, managers)
@@ -288,7 +212,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             mode: 'grab'
                         },
                         onclick: {
-                            enable: false,
+                            enable: true,
                             mode: 'push'
                         },
                         resize: true
@@ -351,47 +275,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Load existing entity data for editing
-    function loadExistingEntity(entityId) {
-        try {
-            // Get all entities
-            const entities = JSON.parse(localStorage.getItem('userEntities') || '[]');
-            
-            // Find the entity to edit
-            const entity = entities.find(e => e.id == entityId);
-            
-            if (entity) {
-                // Fill form fields with existing data
-                document.getElementById('name').value = entity.name || '';
-                document.getElementById('pan').value = entity.pan || '';
-                document.getElementById('gst').value = entity.gst || '';
-                document.getElementById('phone').value = entity.phone || '';
-                document.getElementById('address').value = entity.address || '';
-                document.getElementById('district').value = entity.district || '';
-                
-                // Add managers
-                if (entity.managers && Array.isArray(entity.managers)) {
-                    entity.managers.forEach(manager => {
-                        addManager({
-                            name: manager.name || '',
-                            phone: manager.phone || ''
-                        });
-                    });
-                }
-                
-                // Disable name and PAN fields as they shouldn't be editable
-                document.getElementById('name').disabled = true;
-                document.getElementById('pan').disabled = true;
-                
-                // Store the entity ID for updating
-                document.getElementById('name').dataset.entityId = entityId;
-            }
-        } catch (error) {
-            console.error('Error loading entity for editing:', error);
-            alert('Failed to load entity data. Please try again.');
-        }
-    }
-
     // Add a new manager card
     function addManager(managerData = { name: '', phone: '' }) {
         if (!managerTemplate || !managersList) return;
@@ -448,7 +331,8 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
         
-
+        // Add ripple effect to button
+        deleteBtn.addEventListener('click', createRipple);
     }
 
     // Get form data as an object
@@ -569,5 +453,39 @@ document.addEventListener('DOMContentLoaded', function() {
         return true; // All validations passed
     }
 
+    // Initialize ripple effect for buttons
+    function initRippleEffect() {
+        const buttons = document.querySelectorAll('button');
+        buttons.forEach(button => {
+            button.addEventListener('click', createRipple);
+        });
+    }
 
+    // Create ripple effect on button click
+    function createRipple(e) {
+        const button = e.currentTarget;
+        
+        // Create ripple element
+        const ripple = document.createElement('span');
+        ripple.classList.add('ripple');
+        
+        // Set ripple position
+        const rect = button.getBoundingClientRect();
+        const size = Math.max(rect.width, rect.height);
+        const x = e.clientX - rect.left - size / 2;
+        const y = e.clientY - rect.top - size / 2;
+        
+        // Style ripple
+        ripple.style.width = ripple.style.height = `${size}px`;
+        ripple.style.left = `${x}px`;
+        ripple.style.top = `${y}px`;
+        
+        // Add ripple to button
+        button.appendChild(ripple);
+        
+        // Remove ripple after animation
+        setTimeout(() => {
+            ripple.remove();
+        }, 600);
+    }
 });

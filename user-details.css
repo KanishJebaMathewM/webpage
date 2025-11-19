@@ -42,12 +42,15 @@ body {
 }
 
 #particles-js {
-    position: absolute;
+    /* Keep particles fixed to the viewport and non-blocking so UI remains clickable
+       and particles stay visible while scrolling */
+    position: fixed;
     width: 100%;
     height: 100%;
     top: 0;
     left: 0;
     z-index: 0;
+    pointer-events: none;
 }
 
 /* Container */
@@ -92,6 +95,32 @@ body {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 1rem;
+}
+
+/* Mini action buttons placed top-left on form page */
+.mini-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    margin-right: 0.75rem;
+}
+
+.btn-mini {
+    background: var(--primary-color);
+    color: white;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-mini:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
 }
 
 .logo {
@@ -212,9 +241,15 @@ textarea {
 
 textarea {
     min-height: 100px;
-    resize: vertical;
+    resize: none; /* prevent manual resize, we'll auto-resize via JS */
     padding-top: 1rem;
     padding-bottom: 1rem;
+}
+
+/* Make address textarea visually scrollable when content exceeds max height */
+#address {
+    max-height: 240px;
+    overflow: auto;
 }
 
 input:focus,
@@ -351,15 +386,25 @@ button {
 .btn-add {
     background: var(--primary-color);
     color: white;
-    padding: 0.5rem 1rem;
+    padding: 0.75rem 1.5rem;
     border-radius: 8px;
     font-weight: 500;
     transition: var(--transition);
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
 .btn-add:hover {
     background: var(--primary-dark);
-    transform: translateY(-1px);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(76, 175, 80, 0.3);
+}
+
+.btn-add:active {
+    transform: translateY(0);
 }
 
 .btn-save {
@@ -424,12 +469,14 @@ button {
 .btn-save-form {
     background: linear-gradient(135deg, var(--primary-light), var(--primary-color));
     color: white;
-    padding: 1rem 2rem;
-    font-size: 1rem;
+    padding: 0.45rem 0.9rem; /* further reduced size */
+    font-size: 0.9rem;
     font-weight: 600;
-    border-radius: 12px;
-    width: 100%;
-    box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+    border-radius: 8px;
+    width: auto;
+    max-width: 240px;
+    align-self: center;
+    box-shadow: 0 2px 8px rgba(76, 175, 80, 0.18);
     transition: var(--transition);
     display: flex;
     align-items: center;
@@ -437,9 +484,23 @@ button {
     gap: 0.5rem;
 }
 
+/* Keep full width on small screens for usability */
+@media (max-width: 480px) {
+    .btn-save-form {
+        width: 100%;
+        max-width: none;
+        align-self: stretch;
+    }
+}
+
 .btn-save-form:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+}
+
+/* Slightly larger save icon inside the save button */
+.btn-save-form i {
+    font-size: 1.35rem;
 }
 
 .btn-view-entities {
@@ -506,27 +567,6 @@ button {
     animation: fadeIn 0.3s ease-out forwards;
 }
 
-/* Ripple effect for buttons */
-button {
-    position: relative;
-    overflow: hidden;
-}
 
-.ripple {
-    position: absolute;
-    border-radius: 50%;
-    background-color: rgba(255, 255, 255, 0.7);
-    transform: scale(0);
-    animation: ripple 0.6s linear;
-    pointer-events: none;
-    width: 20px;
-    height: 20px;
-    margin: -10px 0 0 -10px;
-}
 
-@keyframes ripple {
-    to {
-        transform: scale(4);
-        opacity: 0;
-    }
-}
+

@@ -42,14 +42,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             },
             interactivity: {
-                detect_on: 'canvas',
+                /* Use window detection so particles respond to cursor even when
+                   canvas is behind UI elements */
+                detect_on: 'window',
                 events: {
                     onhover: {
                         enable: true,
                         mode: 'grab'
                     },
                     onclick: {
-                        enable: true,
+                        enable: false,
                         mode: 'push'
                     },
                     resize: true
@@ -146,54 +148,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Add ripple effect to buttons
-    const buttons = document.querySelectorAll('button');
-    buttons.forEach(button => {
-        button.addEventListener('click', function(e) {
-            const rect = this.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            
-            const ripple = document.createElement('span');
-            ripple.classList.add('ripple');
-            ripple.style.left = `${x}px`;
-            ripple.style.top = `${y}px`;
-            
-            this.appendChild(ripple);
-            
-            // Remove ripple after animation completes
-            setTimeout(() => {
-                ripple.remove();
-            }, 1000);
-        });
-    });
+
 });
 
-// Add CSS for ripple effect
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes ripple {
-        to {
-            transform: scale(4);
-            opacity: 0;
-        }
-    }
-    
-    .ripple {
-        position: absolute;
-        border-radius: 50%;
-        background-color: rgba(255, 255, 255, 0.7);
-        transform: scale(0);
-        animation: ripple 0.6s linear;
-        pointer-events: none;
-        width: 20px;
-        height: 20px;
-        margin: -10px 0 0 -10px;
-    }
-    
-    button {
-        position: relative;
-        overflow: hidden;
-    }
-`;
-document.head.appendChild(style);
+

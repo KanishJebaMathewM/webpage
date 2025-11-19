@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Local Storage Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px 15px;
+            margin: 5px;
+            cursor: pointer;
+        }
+        .success {
+            color: green;
+        }
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <h1>Local Storage Test</h1>
+    
+    <div class="test-section">
+        <h2>Test Data Storage</h2>
+        <button id="storeData">Store Test Data</button>
+        <button id="retrieveData">Retrieve Test Data</button>
+        <button id="clearData">Clear All Data</button>
+        <div id="output"></div>
+    </div>
+
+    <script>
+        document.getElementById('storeData').addEventListener('click', function() {
+            try {
+                // Create test data
+                const testData = [
+                    {
+                        id: "1",
+                        name: "John Doe",
+                        pan: "ABCDE1234F",
+                        gst: "12ABCDE1234F1Z1",
+                        phone: "9876543210",
+                        address: "123 Main St, City",
+                        district: "District A",
+                        created_at: new Date().toISOString(),
+                        managers: [
+                            { name: "Manager 1", phone: "9876543211" },
+                            { name: "Manager 2", phone: "9876543212" }
+                        ]
+                    },
+                    {
+                        id: "2",
+                        name: "Jane Smith",
+                        pan: "FGHIJ5678K",
+                        gst: null,
+                        phone: "8765432109",
+                        address: "456 Oak Ave, Town",
+                        district: "District B",
+                        created_at: new Date().toISOString(),
+                        managers: [
+                            { name: "Manager 3", phone: "8765432108" }
+                        ]
+                    }
+                ];
+                
+                // Store in local storage
+                localStorage.setItem('userData', JSON.stringify(testData));
+                document.getElementById('output').innerHTML = '<p class="success">Test data stored successfully!</p>';
+            } catch (error) {
+                document.getElementById('output').innerHTML = '<p class="error">Error storing data: ' + error.message + '</p>';
+            }
+        });
+
+        document.getElementById('retrieveData').addEventListener('click', function() {
+            try {
+                // Retrieve from local storage
+                const userData = JSON.parse(localStorage.getItem('userData')) || [];
+                if (userData.length > 0) {
+                    document.getElementById('output').innerHTML = '<p class="success">Retrieved ' + userData.length + ' records:<br>' + 
+                        JSON.stringify(userData, null, 2).replace(/\n/g, '<br>').replace(/ /g, '&nbsp;') + '</p>';
+                } else {
+                    document.getElementById('output').innerHTML = '<p class="error">No data found in local storage.</p>';
+                }
+            } catch (error) {
+                document.getElementById('output').innerHTML = '<p class="error">Error retrieving data: ' + error.message + '</p>';
+            }
+        });
+
+        document.getElementById('clearData').addEventListener('click', function() {
+            try {
+                localStorage.removeItem('userData');
+                document.getElementById('output').innerHTML = '<p class="success">All data cleared!</p>';
+            } catch (error) {
+                document.getElementById('output').innerHTML = '<p class="error">Error clearing data: ' + error.message + '</p>';
+            }
+        });
+    </script>
+</body>
+</html>

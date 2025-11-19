@@ -29,6 +29,7 @@
                             <i class="fas fa-arrow-left"></i>
                             <span>Back</span>
                         </button>
+                        <!-- page-level edit toggle removed; per-card edit icons are used -->
                         <button class="btn-refresh" id="refreshBtn">
                             <i class="fas fa-sync-alt"></i>
                             <span>Refresh</span>
@@ -48,9 +49,14 @@
                 <i class="fas fa-inbox"></i>
                 <h3>No Entities Found</h3>
                 <p>Start by adding user details from the user details page.</p>
-                <button class="btn-add-new" id="addNewBtn">
-                    <i class="fas fa-plus"></i>
-                    <span>Add New Entity</span>
+                <button class="btn-add-new btn-add-first" id="addNewBtn" aria-label="Add your first entity">
+                    <span class="icon-plus" aria-hidden="true">
+                        <!-- Crisp inline SVG plus inside a white circle to avoid font rendering issues -->
+                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" role="img" focusable="false">
+                            <path d="M11 11V6a1 1 0 1 1 2 0v5h5a1 1 0 1 1 0 2h-5v5a1 1 0 1 1-2 0v-5H6a1 1 0 1 1 0-2h5z" />
+                        </svg>
+                    </span>
+                    <span>Add your first entity</span>
                 </button>
             </div>
 
@@ -72,6 +78,9 @@
                     <h3 class="entity-name"></h3>
                 </div>
                 <div class="entity-actions">
+                    <button class="btn-edit-entity" title="Edit entity">
+                        <i class="fas fa-edit"></i>
+                    </button>
                     <button class="btn-delete-entity" title="Delete entity">
                         <i class="fas fa-trash"></i>
                     </button>
@@ -80,27 +89,27 @@
             <div class="entity-details">
                 <div class="detail-row">
                     <span class="detail-label"><i class="fas fa-id-card"></i> PAN:</span>
-                    <span class="detail-value entity-pan"></span>
+                    <span class="detail-value"><div class="value-box entity-pan"></div></span>
                 </div>
                 <div class="detail-row">
                     <span class="detail-label"><i class="fas fa-file-invoice"></i> GST:</span>
-                    <span class="detail-value entity-gst"></span>
+                    <span class="detail-value"><div class="value-box entity-gst"></div></span>
                 </div>
                 <div class="detail-row">
                     <span class="detail-label"><i class="fas fa-phone"></i> Phone:</span>
-                    <span class="detail-value entity-phone"></span>
+                    <span class="detail-value"><div class="value-box"><input class="entity-phone" type="tel" maxlength="10" readonly></div></span>
                 </div>
                 <div class="detail-row">
                     <span class="detail-label"><i class="fas fa-map-marker-alt"></i> Address:</span>
-                    <span class="detail-value entity-address"></span>
+                    <span class="detail-value"><div class="value-box"><textarea class="entity-address" readonly></textarea></div></span>
                 </div>
                 <div class="detail-row">
                     <span class="detail-label"><i class="fas fa-map-marked-alt"></i> District:</span>
-                    <span class="detail-value entity-district"></span>
+                    <span class="detail-value"><div class="value-box entity-district"></div></span>
                 </div>
                 <div class="detail-row">
                     <span class="detail-label"><i class="fas fa-calendar"></i> Created:</span>
-                    <span class="detail-value entity-created"></span>
+                    <span class="detail-value"><div class="value-box entity-created"></div></span>
                 </div>
             </div>
             <div class="entity-managers">
@@ -115,5 +124,127 @@
     <!-- Add particles.js library -->
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     <script src="view-entities.js"></script>
+    
+    <!-- Initialize particles.js for background effect -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize particles.js for background effect
+            if (typeof particlesJS !== 'undefined') {
+                particlesJS('particles-js', {
+                    particles: {
+                        number: {
+                            value: 80,
+                            density: {
+                                enable: true,
+                                value_area: 800
+                            }
+                        },
+                        color: {
+                            value: '#4CAF50'
+                        },
+                        shape: {
+                            type: 'circle'
+                        },
+                        opacity: {
+                            value: 0.5,
+                            random: false
+                        },
+                        size: {
+                            value: 3,
+                            random: true
+                        },
+                        line_linked: {
+                            enable: true,
+                            distance: 150,
+                            color: '#4CAF50',
+                            opacity: 0.4,
+                            width: 1
+                        },
+                        move: {
+                            enable: true,
+                            speed: 2,
+                            direction: 'none',
+                            random: false,
+                            straight: false,
+                            out_mode: 'out',
+                            bounce: false
+                        }
+                    },
+                    interactivity: {
+                        /* Use window detection so particles respond to cursor even when
+                           canvas is behind UI elements */
+                        detect_on: 'window',
+                        events: {
+                            onhover: {
+                                enable: true,
+                                mode: 'grab'
+                            },
+                            onclick: {
+                                enable: false,
+                                mode: 'push'
+                            },
+                            resize: true
+                        },
+                        modes: {
+                            grab: {
+                                distance: 140,
+                                line_linked: {
+                                    opacity: 1
+                                }
+                            },
+                            push: {
+                                particles_nb: 4
+                            }
+                        }
+                    },
+                    retina_detect: true
+                });
+            }
+        });
+    </script>
+    
+    <!-- Auto-resize textareas based on content -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Auto-resize textareas based on content
+            function adjustTextareaHeight(textarea) {
+                textarea.style.height = 'auto';
+                textarea.style.height = textarea.scrollHeight + 'px';
+            }
+            
+            // Adjust textarea heights when content is loaded and when editing
+            document.addEventListener('DOMContentLoaded', function() {
+                const textareas = document.querySelectorAll('.entity-address');
+                textareas.forEach(function(textarea) {
+                    // Initial adjustment
+                    adjustTextareaHeight(textarea);
+                    
+                    // Adjust when content changes
+                    textarea.addEventListener('input', function() {
+                        adjustTextareaHeight(this);
+                    });
+                });
+                
+                // Also adjust when cards are dynamically added
+                const observer = new MutationObserver(function(mutations) {
+                    mutations.forEach(function(mutation) {
+                        mutation.addedNodes.forEach(function(node) {
+                            if (node.nodeType === 1 && node.classList && node.classList.contains('entity-card')) {
+                                const textareas = node.querySelectorAll('.entity-address');
+                                textareas.forEach(function(textarea) {
+                                    adjustTextareaHeight(textarea);
+                                });
+                            }
+                        });
+                    });
+                });
+                
+                const container = document.getElementById('entitiesGrid');
+                if (container) {
+                    observer.observe(container, { childList: true, subtree: true });
+                }
+            });
+        });
+    </script>
 </body>
 </html>
