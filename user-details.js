@@ -5,7 +5,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const managersList = document.getElementById('managersList');
     const managerTemplate = document.getElementById('managerTemplate');
     const viewEntitiesBtn = document.getElementById('viewEntities');
-    const editToggleBtn = document.getElementById('editToggle');
 
     // Initialize the page
     initPage();
@@ -73,17 +72,6 @@ document.addEventListener('DOMContentLoaded', function() {
     if (addManagerBtn) {
         addManagerBtn.addEventListener('click', function() {
             addManager();
-        });
-    }
-
-    // Edit mode toggle
-    if (editToggleBtn) {
-        // Start in non-edit mode
-        setEditMode(false);
-        
-        editToggleBtn.addEventListener('click', function() {
-            const isEditing = document.body.classList.toggle('edit-mode');
-            setEditMode(isEditing);
         });
     }
 
@@ -169,47 +157,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Set edit mode state
-    function setEditMode(isEditing) {
-        const formInputs = document.querySelectorAll('.user-form input, .user-form textarea, .user-form select');
-        const managerInputs = document.querySelectorAll('.manager-card input');
-        
-        formInputs.forEach(input => {
-            input.disabled = !isEditing;
-        });
-        
-        managerInputs.forEach(input => {
-            input.disabled = !isEditing;
-        });
-        
-        // Update button text and style
-        if (editToggleBtn) {
-            if (isEditing) {
-                editToggleBtn.classList.add('editing');
-                editToggleBtn.querySelector('span').textContent = 'Done';
-                editToggleBtn.querySelector('i').classList.remove('fa-edit');
-                editToggleBtn.querySelector('i').classList.add('fa-check');
-            } else {
-                editToggleBtn.classList.remove('editing');
-                editToggleBtn.querySelector('span').textContent = 'Edit';
-                editToggleBtn.querySelector('i').classList.remove('fa-check');
-                editToggleBtn.querySelector('i').classList.add('fa-edit');
-            }
-        }
-        
-        // Disable/enable buttons in edit mode
-        if (addManagerBtn) {
-            addManagerBtn.disabled = !isEditing;
-            addManagerBtn.style.opacity = isEditing ? '1' : '0.5';
-        }
-        
-        const deleteButtons = document.querySelectorAll('.manager-delete');
-        deleteButtons.forEach(btn => {
-            btn.disabled = !isEditing;
-            btn.style.opacity = isEditing ? '1' : '0.5';
-        });
-    }
-
     // Add a new manager card
     function addManager(managerData = { name: '', phone: '' }) {
         if (!managerTemplate || !managersList) return;
@@ -236,15 +183,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Set up event listeners for a manager card
     function setupManagerCard(managerElement) {
         const deleteBtn = managerElement.querySelector('.manager-delete');
-        
-        // Set initial disabled state based on current edit mode
-        const isEditing = document.body.classList.contains('edit-mode');
-        const inputs = managerElement.querySelectorAll('input');
-        inputs.forEach(input => {
-            input.disabled = !isEditing;
-        });
-        deleteBtn.disabled = !isEditing;
-        deleteBtn.style.opacity = isEditing ? '1' : '0.5';
         
         // Delete button click handler
         deleteBtn.addEventListener('click', function() {

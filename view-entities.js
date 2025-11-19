@@ -8,10 +8,14 @@ document.addEventListener('DOMContentLoaded', function() {
     const refreshBtn = document.getElementById('refreshBtn');
     const addNewBtn = document.getElementById('addNewBtn');
     const entityTemplate = document.getElementById('entityTemplate');
+    const editToggleBtn = document.getElementById('editToggle');
 
     // Initialize page
     initParticles();
     loadEntities();
+    
+    // Start in non-edit mode
+    setEditMode(false);
 
     // Initialize particles.js for background effect
     function initParticles() {
@@ -105,6 +109,42 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // Edit mode toggle
+    if (editToggleBtn) {
+        editToggleBtn.addEventListener('click', function() {
+            const isEditing = document.body.classList.toggle('edit-mode');
+            setEditMode(isEditing);
+        });
+    }
+
+    // Set edit mode state
+    function setEditMode(isEditing) {
+        // Update button text and style
+        if (editToggleBtn) {
+            if (isEditing) {
+                editToggleBtn.classList.add('editing');
+                editToggleBtn.querySelector('span').textContent = 'Done';
+                editToggleBtn.querySelector('i').classList.remove('fa-edit');
+                editToggleBtn.querySelector('i').classList.add('fa-check');
+            } else {
+                editToggleBtn.classList.remove('editing');
+                editToggleBtn.querySelector('span').textContent = 'Edit';
+                editToggleBtn.querySelector('i').classList.remove('fa-check');
+                editToggleBtn.querySelector('i').classList.add('fa-edit');
+            }
+        }
+        
+        // Enable/disable contenteditable elements
+        const editableElements = document.querySelectorAll('[contenteditable]');
+        editableElements.forEach(el => {
+            if (isEditing) {
+                el.setAttribute('contenteditable', 'true');
+            } else {
+                el.setAttribute('contenteditable', 'false');
+            }
+        });
+    }
+
     // Load all entities from localStorage
     function loadEntities() {
         showLoading();
@@ -152,34 +192,34 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Set entity data with editable fields
         const nameEl = card.querySelector('.entity-name');
-        nameEl.contentEditable = true;
+        nameEl.contentEditable = false;
         nameEl.textContent = entity.name;
-        nameEl.title = 'Click to edit';
+        nameEl.title = 'Click Edit to modify';
         
         const panEl = card.querySelector('.entity-pan');
-        panEl.contentEditable = true;
+        panEl.contentEditable = false;
         panEl.textContent = entity.pan;
-        panEl.title = 'Click to edit';
+        panEl.title = 'Click Edit to modify';
         
         const gstEl = card.querySelector('.entity-gst');
-        gstEl.contentEditable = true;
+        gstEl.contentEditable = false;
         gstEl.textContent = entity.gst || 'N/A';
-        gstEl.title = 'Click to edit';
+        gstEl.title = 'Click Edit to modify';
         
         const phoneEl = card.querySelector('.entity-phone');
-        phoneEl.contentEditable = true;
+        phoneEl.contentEditable = false;
         phoneEl.textContent = entity.phone;
-        phoneEl.title = 'Click to edit';
+        phoneEl.title = 'Click Edit to modify';
         
         const addressEl = card.querySelector('.entity-address');
-        addressEl.contentEditable = true;
+        addressEl.contentEditable = false;
         addressEl.textContent = entity.address;
-        addressEl.title = 'Click to edit';
+        addressEl.title = 'Click Edit to modify';
         
         const districtEl = card.querySelector('.entity-district');
-        districtEl.contentEditable = true;
+        districtEl.contentEditable = false;
         districtEl.textContent = entity.district;
-        districtEl.title = 'Click to edit';
+        districtEl.title = 'Click Edit to modify';
         
         // Format created date
         const createdDate = new Date(entity.created_at);
@@ -210,8 +250,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 managerItem.className = 'manager-item';
                 managerItem.innerHTML = `
                     <div class="manager-info">
-                        <span class="manager-name" contenteditable="true" title="Click to edit">${manager.name}</span>
-                        <span class="manager-phone" contenteditable="true" title="Click to edit">${manager.phone}</span>
+                        <span class="manager-name" contenteditable="false" title="Click Edit to modify">${manager.name}</span>
+                        <span class="manager-phone" contenteditable="false" title="Click Edit to modify">${manager.phone}</span>
                     </div>
                     <i class="fas fa-user-tie" style="color: var(--primary-color);"></i>
                 `;

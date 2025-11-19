@@ -152,6 +152,26 @@ button {
     transform: translateY(-2px);
 }
 
+.btn-edit-toggle {
+    background: linear-gradient(135deg, var(--primary-light), var(--primary-color));
+    color: white;
+    box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+}
+
+.btn-edit-toggle:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+}
+
+.btn-edit-toggle.editing {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+}
+
+.btn-edit-toggle.editing:hover {
+    box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
+}
+
 .btn-add-new {
     background: linear-gradient(135deg, var(--primary-light), var(--primary-color));
     color: white;
@@ -315,6 +335,33 @@ button {
     font-weight: 500;
     text-align: right;
     word-break: break-word;
+}
+
+/* ContentEditable styles */
+[contenteditable="true"] {
+    cursor: text;
+}
+
+body:not(.edit-mode) [contenteditable="true"] {
+    cursor: not-allowed;
+    user-select: none;
+    pointer-events: none;
+}
+
+body.edit-mode [contenteditable="true"] {
+    background-color: #fffbeb;
+    border-radius: 4px;
+    padding: 2px 4px;
+    transition: var(--transition);
+}
+
+body.edit-mode [contenteditable="true"]:focus {
+    outline: 2px solid #fbbf24;
+    background-color: #fff9e6;
+}
+
+body.edit-mode [contenteditable="true"]:hover {
+    background-color: #fef3c7;
 }
 
 /* Entity Managers */
